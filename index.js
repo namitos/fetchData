@@ -7,7 +7,6 @@ const util = require('util');
 const HttpsProxyAgent = require('https-proxy-agent');
 
 module.exports = (urlFull, headers = {}, body, method = "GET", proxy) => {
-  //console.log(urlFull);
   let urlParsed = url.parse(urlFull);
   let httpLib = urlParsed.protocol === 'https:' ? https : http;
   return new Promise((resolve, reject) => {
@@ -17,7 +16,7 @@ module.exports = (urlFull, headers = {}, body, method = "GET", proxy) => {
       method: method,
       rejectUnauthorized: false,
       host: urlParsed.hostname,
-      port: urlParsed.protocol === 'https:' ? 443 : 80,
+      port: urlParsed.port ? urlParsed.port : urlParsed.protocol === 'https:' ? 443 : 80,
       path: urlParsed.path,
       headers: headers,
       agent: agent
