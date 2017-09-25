@@ -11,7 +11,7 @@ module.exports = (urlFull, headers = {}, body, method = "GET", proxy) => {
   let httpLib = urlParsed.protocol === 'https:' ? https : http;
   return new Promise((resolve, reject) => {
     let parts = Buffer.from('');
-    let agent = proxy ? new HttpsProxyAgent(`http://${proxy.host}:${proxy.port}`) : null;
+    let agent = proxy ? new HttpsProxyAgent(Object.assign({ secureProxy: true }, proxy)) : null;
     let request = {
       method: method,
       rejectUnauthorized: false,
