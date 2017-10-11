@@ -51,7 +51,7 @@ module.exports = (urlFull, headers, body, method, proxy, basicAuth) => {
           } else {
             r = parts;
           }
-          if ([200].includes(res.statusCode)) {
+          if ([200, 201, 202].includes(res.statusCode)) {
             resolve(r);
           } else {
             let result = { statusCode: res.statusCode, headers: res.headers, r };
