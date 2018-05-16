@@ -73,7 +73,7 @@ module.exports = async (urlFull, headers, body, method, proxy, basicAuth) => {
       basicAuth = params.basicAuth;
       urlFull = params.urlFull || params.url;
     }
-    return fetchdata({ urlFull, headers, body, method, proxy, basicAuth });
+    return await fetchdata({ urlFull, headers, body, method, proxy, basicAuth });
   } catch (err) {
     if (err.statusCode) {
       err.name = 'HttpRequestError';
