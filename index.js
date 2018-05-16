@@ -6,17 +6,7 @@ const zlib = require('zlib');
 const util = require('util');
 const HttpsProxyAgent = require('https-proxy-agent');
 
-module.exports = (urlFull, headers, body, method, proxy, basicAuth) => {
-  if (urlFull instanceof Object) {
-    let params = urlFull;
-    headers = params.headers;
-    body = params.body;
-    method = params.method;
-    proxy = params.proxy;
-    basicAuth = params.basicAuth;
-    urlFull = params.url;
-  }
-
+function fetchdata({ urlFull, headers, body, method, proxy, basicAuth }) {
   let urlParsed = url.parse(urlFull);
   let httpLib = urlParsed.protocol === 'https:' ? https : http;
   return new Promise((resolve, reject) => {
@@ -36,7 +26,7 @@ module.exports = (urlFull, headers, body, method, proxy, basicAuth) => {
       res.on('data', (data) => {
         parts = Buffer.concat([parts, data]);
       });
-      res.on('end', async() => {
+      res.on('end', async () => {
         try {
           if (res.headers['content-encoding'] === 'gzip') {
             parts = await util.promisify(zlib.gunzip)(parts);
@@ -70,4 +60,31 @@ module.exports = (urlFull, headers, body, method, proxy, basicAuth) => {
       reject(err);
     });
   });
+};
+
+module.exports = async (urlFull, headers, body, method, proxy, basicAuth) => {
+  try {
+    if (urlFull instanceof Object) {
+      let params = urlFull;
+      headers = params.headers;
+      body = params.body;
+      method = params.method;
+      proxy = params.proxy;
+      basicAuth = params.basicAuth;
+      urlFull = params.urlFull || params.url;
+    }
+    return fetchdata({ urlFull, headers, body, method, proxy, basicAuth });
+  } catch (err) {
+    if (err.statusCode) {
+      err.name = 'HttpRequestError';
+      err.data = { urlFull, headers, body, method, proxy };
+      return Promise.reject(err);
+    } else {
+      return Promise.reject({
+        name: 'HttpRequestError',
+        err,
+        data: { urlFull, headers, body, method, proxy }
+      });
+    }
+  }
 };
