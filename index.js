@@ -1,12 +1,11 @@
 const http = require('http');
 const https = require('https');
 const url = require('url');
-const parseXml = require('xml2json').toJson;
 const zlib = require('zlib');
 const util = require('util');
 const HttpsProxyAgent = require('https-proxy-agent');
 
-function fetchdata({ urlFull, headers, body, method, proxy, basicAuth }) {
+function fetchdata({ urlFull, headers, body, method, proxy, basicAuth, parseXml }) {
   let urlParsed = url.parse(urlFull);
   let httpLib = urlParsed.protocol === 'https:' ? https : http;
   return new Promise((resolve, reject) => {
@@ -33,7 +32,9 @@ function fetchdata({ urlFull, headers, body, method, proxy, basicAuth }) {
           }
           let r;
           if (res.headers['content-type'] && (res.headers['content-type'].indexOf('application/xml') !== -1 || res.headers['content-type'].indexOf('text/xml') !== -1)) {
-            r = parseXml(parts, { object: true });
+            if (parseXml) {
+              r = parseXml(parts);
+            }
           } else if (res.headers['content-type'] && res.headers['content-type'].indexOf('text/html') !== -1) {
             r = parts.toString();
           } else if (res.headers['content-type'] && res.headers['content-type'].indexOf('application/json') !== -1) {
@@ -60,7 +61,7 @@ function fetchdata({ urlFull, headers, body, method, proxy, basicAuth }) {
       reject(err);
     });
   });
-};
+}
 
 module.exports = async (urlFull, headers, body, method, proxy, basicAuth) => {
   try {
