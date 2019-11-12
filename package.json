@@ -17,6 +17,6 @@
   },
   "homepage": "https://github.com/namitos/fetchdata#readme",
   "dependencies": {
-    "https-proxy-agent": "^2.1.0"
+    "https-proxy-agent": "^2.2.4"
   }
 }
